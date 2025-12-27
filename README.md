@@ -58,7 +58,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👤 Autor
 
-**rotinoM0**
+**Matheus Fernandes**
 
 - GitHub: [@rotinoM0](https://github.com/rotinoM0)
 
