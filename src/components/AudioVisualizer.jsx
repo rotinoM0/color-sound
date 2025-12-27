@@ -75,7 +75,7 @@ export default function AudioVisualizer() {
             
             const bars = Math.min(dataArray.length, bufferRange.current);
             for (let i = 0; i < bars; i++) {
-                const barHeight = (dataArray[i] || 0) / 2;
+                const barHeight = (dataArray[i] || 0) / 250 * canvas.current.height;
                 const peak = 2000;
                 const bright = pitch / peak * 255;
                 
@@ -104,7 +104,7 @@ export default function AudioVisualizer() {
             const dataArray = new Uint8Array(analyser.fftSize);
             analyser.getByteTimeDomainData(dataArray);
             
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 5;
             ctx.beginPath();
             const sliceWidth = canvas.current.width / dataArray.length;
 
@@ -164,6 +164,6 @@ export default function AudioVisualizer() {
     }, [isRecording, draw]);
 
     return (
-        <canvas id="view" className="flex justify-center w-1/2" ref={canvas} height={400}></canvas>
+        <canvas id="view" className="w-full h-full mt-20 max-w-full max-h-2xl border-2 border-gray-700 rounded-lg   " ref={canvas} width={800} height={800}></canvas>
     )
 }

@@ -11,7 +11,7 @@ function Canvas() {
 
 export default function Content() {
     return (
-        <div className='px-10 pt-20 flex flex-col gap-10 items-center'>
+        <div className='px-10 py-20 h-full flex flex-col gap-10 items-center border-b border-gray-700'>
             <AudioVisualizer />
             <Frequency />
             <Microphone />
