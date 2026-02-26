@@ -1,6 +1,6 @@
 # 🎵 Color Sound (WIP)
 
-[Experimente Online](https://color-sound.vercel.app/)
+[Experimente Online](https://rotinom0.github.io/color-sound/)
 
 Sistema de visualização de som feito com React.js e JavaScript que transforma áudio em experiências visuais interativas.
 
