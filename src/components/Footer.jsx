@@ -1,7 +1,7 @@
 export default function Footer() {
     return (
         <>
-            <footer className="flex flex-col h-full justify-between items-center gap-5 text-zinc-100 py-20 bg-black border-t border-gray-700">
+            <footer className="flex flex-col h-full justify-between items-center gap-5 text-zinc-400 py-14 border-t border-white/10 bg-white/[0.02]">
                 <p>© 2025 Sound Shape - Matheus Fernandes. Todos os direitos reservados.</p>
                 <div className="flex">
                     <a href="" className="mx-4">

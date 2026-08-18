@@ -1,66 +1,63 @@
-let context = new AudioContext();
-let stream = null;
-let recording = false
+import { useCallback, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
-let noiseSuppression = null;
-let echoCancellation = null;
-let autoGainControl = null;
+export function useMicrophone(settings = {}) {
+    const [isRecording, setIsRecording] = useState(false);
+    const contextRef = useRef(null);
+    const analyserRef = useRef(null);
+    const streamRef = useRef(null);
 
-document.addEventListener('DOMContentLoaded', () => {
-    noiseSuppression = document.getElementById("noise");
-    echoCancellation = document.getElementById("echo");
-    autoGainControl = document.getElementById("autoGain");
-});
+    const toggleMic = useCallback(async () => {
+        if (isRecording) {
+            streamRef.current?.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+            setIsRecording(false);
+            return;
+        }
 
-async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: settings.echoCancellation ?? true,
+                    noiseSuppression: settings.noiseSuppression ?? true,
+                    autoGainControl: settings.autoGainControl ?? true,
+                },
+            });
 
+            if (!contextRef.current) {
+                contextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            const context = contextRef.current;
+            if (context.state === 'suspended') {
+                await context.resume();
+            }
 
-    const micStream = await navigator.mediaDevices.getUserMedia(
-        {
-            audio: {
-                echoCancellation: echoCancellation.checked,
-                noiseSuppression: noiseSuppression.checked,
-                autoGainControl: autoGainControl.checked
-            },
-        });
+            const source = context.createMediaStreamSource(stream);
 
+            const filter = context.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(100, context.currentTime);
 
-    stream = micStream;
+            const analyser = context.createAnalyser();
+            analyser.fftSize = 256;
 
-    const filter = context.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.setValueAtTime(100, context.currentTime);
+            source.connect(filter);
+            source.connect(analyser);
 
+            streamRef.current = stream;
+            analyserRef.current = analyser;
+            setIsRecording(true);
+        } catch (error) {
+            console.error('Erro ao acessar o microfone:', error);
+        }
+    }, [isRecording, settings.echoCancellation, settings.noiseSuppression, settings.autoGainControl]);
 
+    useEffect(() => {
+        return () => {
+            streamRef.current?.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+        };
+    }, []);
 
-    const source = context.createMediaStreamSource(micStream);
-    const analyser = context.createAnalyser();
-    source.connect(filter);
-    source.connect(analyser);
-    window.dispatchEvent(new Event("StartRecording"));
-    // Updatecanvas(analyzer);
+    return { isRecording, toggleMic, analyserRef };
 }
-
-async function stopRecording() {
-    stream.getTracks().forEach(s => s.stop());
-    stream = null;
-    window.dispatchEvent(new Event("StopRecording"));
-}
-
-async function toggleMic() {
-    recording = !recording;
-
-    if (context.state !== 'running')
-        startContext()
-    recording ? startRecording() : stopRecording();
-}
-
-async function startContext() {
-    await context.resume();
-}
-
-function useRecording() {
-    return recording;
-}
-
-export {toggleMic, useRecording};
